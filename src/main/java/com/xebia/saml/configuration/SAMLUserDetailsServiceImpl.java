@@ -41,17 +41,19 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
         // The method is supposed to identify local account of user referenced by
         // data in the SAML assertion and return UserDetails object describing the user.
 
-        String userID = credential.getNameID().getValue();
-
-        LOG.info(userID + " is logged in");
-        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+        List<GrantedAuthority> authorities = new ArrayList<>();
         GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_USER");
         authorities.add(authority);
 
         // In a real scenario, this implementation has to locate user in a arbitrary
         // dataStore based on information present in the SAMLCredential and
         // returns such a date in a form of application specific UserDetails object.
-        return new User(userID, "<abc123>", true, true, true, true, authorities);
+
+        return new User(credential.getAttributeAsString("urn:oid:0.9.2342.19200300.100.1.1")
+                , "a", true, true, true, true, authorities);
     }
 
+    private String getAttribute(SAMLCredential credential, String key) {
+        return credential.getAttributeAsString(key);
+    }
 }

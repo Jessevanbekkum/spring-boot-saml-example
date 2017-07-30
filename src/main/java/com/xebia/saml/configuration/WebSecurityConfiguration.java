@@ -26,7 +26,6 @@ import java.util.Timer;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import com.xebia.saml.configuration.SAMLUserDetailsServiceImpl;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.protocol.Protocol;
@@ -276,7 +275,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public ExtendedMetadata extendedMetadata() {
         ExtendedMetadata extendedMetadata = new ExtendedMetadata();
-        extendedMetadata.setIdpDiscoveryEnabled(true);
+        extendedMetadata.setIdpDiscoveryEnabled(false);
         extendedMetadata.setSignMetadata(false);
         extendedMetadata.setEcpEnabled(true);
         return extendedMetadata;
@@ -292,11 +291,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     @Qualifier("idp-ssocircle")
-    public ExtendedMetadataDelegate ssoCircleExtendedMetadataProvider()
+    public ExtendedMetadataDelegate metadataProvider()
             throws MetadataProviderException {
-        String idpSSOCircleMetadataURL = "https://idp.ssocircle.com/idp-meta.xml";
+        String testShibMetadataUrl = "http://www.testshib.org/metadata/testshib-providers.xml";
         HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(
-                this.backgroundTaskTimer, httpClient(), idpSSOCircleMetadataURL);
+                this.backgroundTaskTimer, httpClient(), testShibMetadataUrl);
         httpMetadataProvider.setParserPool(parserPool());
         ExtendedMetadataDelegate extendedMetadataDelegate =
                 new ExtendedMetadataDelegate(httpMetadataProvider, extendedMetadata());
@@ -313,7 +312,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Qualifier("metadata")
     public CachingMetadataManager metadata() throws MetadataProviderException {
         List<MetadataProvider> providers = new ArrayList<MetadataProvider>();
-        providers.add(ssoCircleExtendedMetadataProvider());
+        providers.add(metadataProvider());
         return new CachingMetadataManager(providers);
     }
 
@@ -525,6 +524,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/").permitAll()
                 .antMatchers("/error").permitAll()
                 .antMatchers("/saml/**").permitAll()
+                .antMatchers("/context/**").permitAll()
                 .anyRequest().authenticated();
         http
                 .logout()

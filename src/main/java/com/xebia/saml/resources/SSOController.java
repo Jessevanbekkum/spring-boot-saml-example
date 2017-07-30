@@ -21,6 +21,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,7 @@ public class SSOController {
         for (String idp : idps)
           LOG.info("Configured Identity Provider for SSO: " + idp);
         model.addAttribute("idps", idps);
-        return "saml/idpselection";
+        return "idpselection";
       } else {
         LOG.warn("Direct accesses to '/idpSelection' route are not allowed");
         return "redirect:/";
