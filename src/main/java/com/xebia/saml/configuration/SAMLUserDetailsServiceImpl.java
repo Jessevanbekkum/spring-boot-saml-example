@@ -19,11 +19,11 @@ package com.xebia.saml.configuration;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.xebia.saml.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.saml.SAMLCredential;
 import org.springframework.security.saml.userdetails.SAMLUserDetailsService;
@@ -49,11 +49,12 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
         // dataStore based on information present in the SAMLCredential and
         // returns such a date in a form of application specific UserDetails object.
 
-        return new User(credential.getAttributeAsString("urn:oid:0.9.2342.19200300.100.1.1")
-                , "a", true, true, true, true, authorities);
+        String username = credential.getAttributeAsString("urn:oid:0.9.2342.19200300.100.1.1");
+        String email = credential.getAttributeAsString("urn:oid:1.3.6.1.4.1.5923.1.1.1.6");
+        String surname = credential.getAttributeAsString("urn:oid:2.5.4.4");
+        String givenName= credential.getAttributeAsString("urn:oid:2.5.4.42");
+
+        return new User(username, email, givenName, surname, authorities);
     }
 
-    private String getAttribute(SAMLCredential credential, String key) {
-        return credential.getAttributeAsString(key);
-    }
 }
